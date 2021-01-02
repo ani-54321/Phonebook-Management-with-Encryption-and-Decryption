@@ -238,9 +238,9 @@ int main(int argc, char const *argv[])
         case 1:
             printf("\n---------------------------------------------------\n");
             printf("Enter contact name : ");
-            scanf("%s", contact_name);
+            scanf(" %[^\n]s", contact_name);
             printf("Enter contact number : ");
-            scanf("%s", contact_number);
+            scanf(" %[^\n]s", contact_number);
             printf("\n---------------------------------------------------\n");
 
             strncat(make_data, "1", strlen("1"));
@@ -276,7 +276,7 @@ int main(int argc, char const *argv[])
         case 2:
             printf("\n---------------------------------------------------\n");
             printf("Enter contact name to delete : ");
-            scanf("%s", contact_name);
+            scanf(" %[^\n]s", contact_name);
             printf("\n---------------------------------------------------\n");
 
             strncat(make_data, "2", strlen("2"));
@@ -313,7 +313,7 @@ int main(int argc, char const *argv[])
         case 3:
             printf("\n---------------------------------------------------\n");
             printf("Enter contact name to search : ");
-            scanf("%s", contact_name);
+            scanf(" %[^\n]s", contact_name);
             printf("\n---------------------------------------------------\n");
 
             strncat(make_data, "3", strlen("3"));

@@ -164,12 +164,93 @@ int b64_decode(const char *in, unsigned char *out, size_t outlen)
     return 1;
 }
 
-void add_contact(char *enc_data)
+void add_contact(char *enc_data, int new_socket)
 {
     // create a file if doesn't exist
     FILE *fp = fopen("phone.txt", "a+");
+    char line[1024];
+    int flag = 1;
+    // char unsuc = '0';
+    char *dec_data;
+    char *dec;
+    char *sent;
+    size_t sent_len;
+    size_t dec_data_len;
 
-    fprintf(fp, "%s\n", enc_data);
+    dec_data_len = b64_decoded_size(enc_data) + 1;
+    dec_data = malloc(dec_data_len);
+
+    b64_decode(enc_data, (unsigned char *)dec_data, dec_data_len);
+
+    for (int i = 0; i < strlen(dec_data); i++)
+    {
+        if (dec_data[i] == '|')
+        {
+            dec_data[i] = '\0';
+            break;
+        }
+    }
+
+    // printf("%s,,,%s", out, dec);
+    // bzero(dec, sizeof(dec));
+
+    while (fgets(line, sizeof(line), fp) != NULL)
+    {
+        // printf("strlen : %ld, sizeof: %ld", strlen(line), sizeof(line));
+
+        for (int i = 0; i < sizeof(line); i++)
+        {
+            if (line[i] == '\n')
+            {
+                line[i] = '\0';
+            }
+        }
+
+        sent = line;
+        // printf("sent : %s\n", sent);
+        sent_len = b64_decoded_size(sent) + 1;
+        dec = malloc(sent_len);
+
+        b64_decode(sent, (unsigned char *)dec, sent_len);
+
+        for (int i = 0; i < strlen(dec); i++)
+        {
+            if (dec[i] == '|')
+            {
+                dec[i] = '\0';
+                break;
+            }
+        }
+
+        // printf("sent : %s\n", sent);
+
+        // printf("%s", dec);
+
+        // if_present(dec, out, &flag);
+
+        flag = strcmp(dec_data, dec);
+        // printf("\nSearched Name : %s\nAvailable Name : %s", out, dec);
+        // printf("\nMatch Found :%d\n", flag);
+
+        if (flag == 0)
+        {
+            // send(new_socket, line, sizeof(line), 0);
+            // fputs(line, stdout);
+            printf("Contact Not Added (name already exists)!!\n");
+            printf("\n---------------------------------------------------\n");
+            break;
+        }
+
+        bzero(line, sizeof(line));
+    }
+
+    if (flag != 0)
+    {
+        fprintf(fp, "%s\n", enc_data);
+        printf("Contact Added Successfully!!\n");
+        printf("\n---------------------------------------------------\n");
+    }
+
     fclose(fp);
 }
 
@@ -433,14 +514,12 @@ int main(int argc, char const *argv[])
             break;
 
         case '1':
-            printf("Contact Added Successfully!!\n");
-            printf("\n---------------------------------------------------\n");
             out = &out[1];
             // printf("contact added string : %s\n", out);
             enc = b64_encode((const unsigned char *)out, strlen(out));
             b64_decode(enc, (unsigned char *)out, out_len);
             // printf("%s", out);
-            add_contact(enc);
+            add_contact(enc, new_socket);
             break;
 
         case '2':
